@@ -55,4 +55,11 @@ coverage.xml
 docs/_build/
 
 # PyBuilder
+
+#virtualenv
 target/
+bin/
+include/
+local/
+pip-selfcheck.json
+share/

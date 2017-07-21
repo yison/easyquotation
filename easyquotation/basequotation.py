@@ -6,9 +6,12 @@ import warnings
 import aiohttp
 import easyutils
 import yarl
+import gflags
 
 from . import helpers
+from . import flags
 
+FLAGS = gflags.FLAGS
 
 class BaseQuotation:
     """行情获取基类"""
@@ -19,6 +22,7 @@ class BaseQuotation:
         self._session = None
         stock_codes = self.load_stock_codes()
         self.stock_list = self.gen_stock_list(stock_codes)
+        self.proxy = FLAGS.proxy if FLAGS.proxy else None
 
     def gen_stock_list(self, stock_codes):
         stock_with_exchange_list = [easyutils.stock.get_stock_type(code) + code[-6:] for code in stock_codes]
@@ -93,7 +97,7 @@ class BaseQuotation:
         }
         url = yarl.URL(self.stock_api + params, encoded=True)
         try:
-            async with self._session.get(url, timeout=10, headers=headers) as r:
+            async with self._session.get(url, proxy=self.proxy, timeout=10, headers=headers) as r:
                 response_text = await r.text()
                 return response_text
         except asyncio.TimeoutError:
